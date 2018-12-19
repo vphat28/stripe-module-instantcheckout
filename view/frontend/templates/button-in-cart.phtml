@@ -1,0 +1,19 @@
+<?php
+/** @var \Stripeofficial\Core\Helper\Data $helper */
+$helper = $block->getHelper();
+
+/** @var \Magento\Store\Model\Store $store */
+$store = $block->getStore();
+
+/** @var \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig */
+$scopeConfig = $block->getScopeConfig();
+?>
+<div data-mage-init='{"Stripeofficial_InstantCheckout/js/button-in-cart":{
+    "public_key": "<?php echo $block->escapeQuote($helper->getAPIKey()); ?>",
+    "country_code": "<?php echo $block->escapeQuote($scopeConfig->getValue('general/country/default')); ?>",
+    "currency_code": "<?php echo $block->escapeQuote($store->getCurrentCurrencyCode()); ?>"
+}}'>
+    <div id="stripe-payment-request-button" data-payment-element="1">
+    <!-- A Stripe Element will be inserted here. -->
+    </div>
+</div>

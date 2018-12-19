@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+           <group id="stripe_section" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="stripeinstantcheckout" translate="label" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Stripe Instant Checkout</label>
+                <frontend_model>Stripeofficial\InstantCheckout\Block\Adminhtml\Config\Fieldset</frontend_model>
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/stripeinstantcheckout/active</config_path>
+                    <backend_model>Stripeofficial\Core\Model\Backend\StripeValid</backend_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
+                    <config_path>payment/stripeinstantcheckout/title</config_path>
+                </field>
+                <field id="payment_action" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Payment Action</label>
+                    <source_model>Stripeofficial\InstantCheckout\Model\Adminhtml\Source\PaymentAction</source_model>
+                    <config_path>payment/stripeinstantcheckout/payment_action</config_path>
+                </field>
+                <field id="sort_order" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1"
+                       showInStore="0">
+                    <label>Sort Order</label>
+                    <config_path>payment/stripeinstantcheckout/sort_order</config_path>
+                    <frontend_class>validate-number</frontend_class>
+                </field>
+            </group>
+        </group>
+        </section>
+    </system>
+</config>

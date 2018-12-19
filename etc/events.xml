@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="payment_method_assign_data_stripeinstantcheckout">
+        <observer name="stripeinstantcheckout_payment_gateway_data_assign" instance="Stripeofficial\InstantCheckout\Observer\DataAssignObserver" />
+    </event>
+    <event name="checkout_submit_all_after">
+        <observer name="stripeinstantcheckout_checkout_submit_all_after" instance="Stripeofficial\InstantCheckout\Observer\DataAssignAfterSuccessObserver" />
+    </event>
+    <event name="stripe_charge_completed">
+        <observer name="stripeinstantcheckout_stripe_charge_completed" instance="Stripeofficial\InstantCheckout\Observer\DataAssignAfterCharge" />
+    </event>
+</config>

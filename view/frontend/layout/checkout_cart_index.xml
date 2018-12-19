@@ -1,0 +1,7 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="checkout.cart.methods">
+            <block name="checkout.cart.methods.stripeinstantcheckout" class="Stripeofficial\InstantCheckout\Block\Button" template="Stripeofficial_InstantCheckout::button-in-cart.phtml" after="checkout.cart.methods.onepage.bottom"/>
+        </referenceContainer>
+    </body>
+</page>

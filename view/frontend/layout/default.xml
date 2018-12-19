@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="minicart">
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="minicart_content" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="extra_info" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="stripinstantcheckout" xsi:type="array">
+                                            <item name="component" xsi:type="string">Stripeofficial_InstantCheckout/js/button-in-minicart</item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+        <referenceContainer name="root">
+            <block name="stripeinstantcheckout.config" class="Stripeofficial\InstantCheckout\Block\Config" template="Stripeofficial_InstantCheckout::config.phtml"/>
+        </referenceContainer>
+    </body>
+</page>
