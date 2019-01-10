@@ -41,7 +41,7 @@ class Config extends Template
      * @param CustomerSession $customerSession
      * @param Data $helper
      * @param FormatInterface $format
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param array $data
      */
     public function __construct(
         Template\Context $context,
@@ -49,14 +49,13 @@ class Config extends Template
         CustomerSession $customerSession,
         Data $helper,
         FormatInterface $format,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->checkoutSession = $checkoutSession;
         $this->helper = $helper;
         $this->customerSession = $customerSession;
-        $this->scopeConfig = $scopeConfig;
+        $this->scopeConfig = $context->getScopeConfig();
         $this->format = $format;
     }
 
