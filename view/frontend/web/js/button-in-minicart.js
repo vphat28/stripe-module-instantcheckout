@@ -80,7 +80,7 @@ define(
 
                         // Needed because Apple Pay only exposes address after confirmation
                         formattedAddress.street = ev.shippingAddress.addressLine;
-                        formattedAddress.region = ev.shippingAddress.region ? ev.shippingAddress.region : [ev.shippingAddress.city];
+                        formattedAddress.region = ev.shippingAddress.region ? ev.shippingAddress.region : ev.shippingAddress.city;
                         formattedAddress.telephone = ev.shippingAddress.phone ? ev.shippingAddress.phone : '000000000';
 
                         if (!helper.isGuest()) {
@@ -221,7 +221,6 @@ define(
 
                     paymentRequest.on('shippingaddresschange', function (ev) {
                         var urlXhr;
-
                         if (!helper.isGuest()) {
                             urlXhr = urlBuilder.build('rest/V1/carts/' + 'mine' + '/estimate-shipping-methods');
                         } else {
@@ -231,7 +230,7 @@ define(
                         // Format address
                         formattedAddress = {
                             'country_id': ev.shippingAddress.country,
-                            'region': ev.shippingAddress.region ? ev.shippingAddress.region : [ev.shippingAddress.city],
+                            'region': ev.shippingAddress.region ? ev.shippingAddress.region : ev.shippingAddress.city,
                             'street': ev.shippingAddress.addressLine ? ev.shippingAddress.addressLine : [ev.shippingAddress.city],
                             'telephone': ev.shippingAddress.phone ? ev.shippingAddress.phone : '000000000',
                             'postcode': ev.shippingAddress.postalCode,
