@@ -114,6 +114,36 @@ class CalculateShipping extends Action
                 ]
             ];
 
+            if ($productType == 'simple') {
+                $customizableOptions = [];
+
+                foreach ($data['form'] as $field) {
+                    if (strpos($field['name'], 'options') !== false) {
+                        if (empty($field['value'])) {
+                            $result->setHttpResponseCode(400);
+                            $result->setData(false);
+
+                            return $result;
+                        }
+
+                        preg_match('/\[(.*?)\]/', $field['name'], $matches);
+                        $customizableOptions[$matches[1]] = $field['value'];
+                    }
+                }
+
+                if (!empty($customizableOptions)) {
+                    $json['cartItem']['productOption'] = ['extensionAttributes' => ['custom_options' => []]];
+                    $json['cartItem']['productType'] = 'simple';
+
+                    foreach ($customizableOptions as $attribute => $value) {
+                        $json['cartItem']['productOption']['extensionAttributes']['custom_options'][] = [
+                            'option_id' => $attribute,
+                            'option_value' => $value,
+                        ];
+                    }
+                }
+            }
+
             if ($productType == 'configurable') {
                 $json['cartItem']['productOption'] = ['extensionAttributes' => ['configurableItemOptions' => []]];
                 $json['cartItem']['productType'] = 'configurable';

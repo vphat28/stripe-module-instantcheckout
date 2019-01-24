@@ -2,8 +2,9 @@ define([
     'jquery',
     'mage/url',
     'mage/translate',
-    'Stripeofficial_InstantCheckout/js/confirmation'
-], function ($, urlBuilder, $t, confirmation) {
+    'Stripeofficial_InstantCheckout/js/confirmation',
+    'Stripeofficial_InstantCheckout/js/helper'
+], function ($, urlBuilder, $t, confirmation, helper) {
     return function (config, element) {
         var initStripeForm = function () {
             var formattedAddress;
@@ -30,8 +31,11 @@ define([
 
             var chargeRequest = function (ev) {
                 var urlXhr;
-                urlXhr = urlBuilder.build('rest/V1/guest-carts/' + cartId + '/payment-information');
-
+                if (!helper.isGuest()) {
+                    urlXhr = urlBuilder.build('rest/V1/carts/' + 'mine' + '/payment-information');
+                } else {
+                    urlXhr = urlBuilder.build('rest/V1/guest-carts/' + cartId + '/payment-information');
+                }
                 var paymentInformation = {
                     'email': ev.payerEmail,
                     'paymentMethod': {
@@ -77,7 +81,11 @@ define([
                 formattedAddress.region = ev.shippingAddress.region ? ev.shippingAddress.region : ev.shippingAddress.city;
                 formattedAddress.telephone = ev.shippingAddress.phone ? ev.shippingAddress.phone : '000000000';
 
-                urlXhr = urlBuilder.build('rest/V1/guest-carts/' + cartId + '/shipping-information');
+                if (!helper.isGuest()) {
+                    urlXhr = urlBuilder.build('rest/V1/carts/' + 'mine' + '/shipping-information');
+                } else {
+                    urlXhr = urlBuilder.build('rest/V1/guest-carts/' + cartId + '/shipping-information');
+                }
 
                 var shippingAddress = formattedAddress;
                 shippingAddress.same_as_billing = 1;

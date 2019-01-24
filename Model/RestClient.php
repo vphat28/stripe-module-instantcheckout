@@ -2,7 +2,9 @@
 
 namespace Stripeofficial\InstantCheckout\Model;
 
+use Magento\Authorization\Model\UserContextInterface;
 use Magento\Framework\UrlInterface;
+use Magento\Integration\Model\Oauth\Token;
 use Magento\Store\Model\StoreManagerInterface;
 use Stripeofficial\InstantCheckout\Helper\Data;
 
@@ -18,20 +20,38 @@ class RestClient
      */
     protected $baseUrl; /* @codingStandardsIgnoreLine */
 
+    /** @var Token */
+    private $token = null;
+
     /**
      * @var Data
      */
     protected $helper; /* @codingStandardsIgnoreLine */
 
+    /** @var UserContextInterface */
+    protected $userContext;
+
+    /** @var \Magento\Integration\Model\Oauth\TokenFactory */
+    private $tokenFactory;
+
     /**
      * RestClient constructor.
      * @param StoreManagerInterface $storeManager
      * @param Data $helper
+     * @param UserContextInterface $userContext
+     * @param \Magento\Integration\Model\Oauth\TokenFactory $token
      */
-    public function __construct(StoreManagerInterface $storeManager, Data $helper)
+    public function __construct(
+        StoreManagerInterface $storeManager,
+        Data $helper,
+        UserContextInterface $userContext,
+        \Magento\Integration\Model\Oauth\TokenFactory $tokenFactory
+    )
     {
         $this->storeManager = $storeManager;
         $this->helper = $helper;
+        $this->userContext = $userContext;
+        $this->tokenFactory = $tokenFactory;
     }
 
     private function _init()
@@ -46,13 +66,37 @@ class RestClient
     public function createCart()
     {
         $this->_init();
+        $userId = null;
         /* @codingStandardsIgnoreStart */
-        $ch = curl_init($this->baseUrl . 'rest/V1/guest-carts');
+        if (!empty($this->userContext->getUserId())) {
+            $userId = $this->userContext->getUserId();
+            /** @var \Magento\Integration\Model\Oauth\Token $token */
+            $token = $this->tokenFactory->create();
+            //$token->v();
+            $token->loadByCustomerId($userId);
+            $token->setCreatedAt(date('Y-m-d H:i:s'));
+            $token->save();
+
+            if (empty($token->getToken())) {
+                $token->createCustomerToken($userId);
+            }
+
+            $ch = curl_init($this->baseUrl . 'rest/V1/carts/mine');
+        } else {
+            $ch = curl_init($this->baseUrl . 'rest/V1/guest-carts');
+        }
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        $headers = [
             'Content-Type:	application/json'
-        ]);
+        ];
+
+        if (!empty($userId)) {
+            $headers[] = 'Authorization: Bearer ' . $token->getToken();
+            $this->token = $token;
+        }
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $result = curl_exec($ch);
         /* @codingStandardsIgnoreEnd */
@@ -71,13 +115,27 @@ class RestClient
         $this->_init();
         /* @codingStandardsIgnoreStart */
         $json = json_encode($cartItem);
-        $ch = curl_init($this->baseUrl . 'rest/V1/guest-carts/' . $cartId . '/items');
+        $userId = null;
+
+        if (!empty($this->userContext->getUserId())) {
+            $userId = $this->userContext->getUserId();
+            $ch = curl_init($this->baseUrl . 'rest/V1/carts/mine/items');
+        } else {
+            $ch = curl_init($this->baseUrl . 'rest/V1/guest-carts/' . $cartId . '/items');
+        }
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+
+        $headers = [
             'Content-Type:	application/json'
-        ]);
+        ];
+
+        if (!empty($userId)) {
+            $headers[] = 'Authorization: Bearer ' . $this->token->getToken();
+        }
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $resultCh = curl_exec($ch);
         /* @codingStandardsIgnoreEnd */
@@ -94,17 +152,30 @@ class RestClient
     {
         $this->_init();
         $json = json_encode($address);
+        $userId = null;
 
-        /* @codingStandardsIgnoreStart */
-        $ch = curl_init($this->baseUrl . 'rest/V1/guest-carts/' . $cartId . '/estimate-shipping-methods');
+        if (!empty($this->userContext->getUserId())) {
+            $userId = $this->userContext->getUserId();
+            /* @codingStandardsIgnoreStart */
+            $ch = curl_init($this->baseUrl . 'rest/V1/carts/mine/estimate-shipping-methods');
+        } else {
+            /* @codingStandardsIgnoreStart */
+            $ch = curl_init($this->baseUrl . 'rest/V1/guest-carts/' . $cartId . '/estimate-shipping-methods');
+        }
 
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        $headers = [
             'Content-Type:	application/json',
             'X-Requested-With: XMLHttpRequest',
-        ]);
+        ];
+
+        if (!empty($userId)) {
+            $headers[] = 'Authorization: Bearer ' . $this->token->getToken();
+        }
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $resultCh = curl_exec($ch);
         /* @codingStandardsIgnoreEnd */
