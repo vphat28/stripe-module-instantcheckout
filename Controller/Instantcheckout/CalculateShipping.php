@@ -74,6 +74,8 @@ class CalculateShipping extends Action
                     $form[$field['name']] = $field['value'];
                 }
             } else {
+                // type configurable
+                $customizableOptions = [];
                 foreach ($data['form'] as $field) {
                     $form[$field['name']] = $field['value'];
 
@@ -88,6 +90,18 @@ class CalculateShipping extends Action
                         $productType = 'configurable';
                         preg_match('/\[(.*?)\]/', $field['name'], $matches);
                         $configurableProductAttributes[$matches[1]] = $field['value'];
+                    }
+
+                    if (strpos($field['name'], 'options') !== false) {
+                        if (empty($field['value'])) {
+                            $result->setHttpResponseCode(400);
+                            $result->setData(false);
+
+                            return $result;
+                        }
+
+                        preg_match('/\[(.*?)\]/', $field['name'], $matches);
+                        $customizableOptions[$matches[1]] = $field['value'];
                     }
                 }
             }
@@ -153,6 +167,17 @@ class CalculateShipping extends Action
                         'optionId' => $attribute,
                         'optionValue' => $value,
                     ];
+                }
+
+                if (!empty($customizableOptions)) {
+                    $json['cartItem']['productOption']['extensionAttributes']['custom_options'] = [];
+
+                    foreach ($customizableOptions as $attribute => $value) {
+                        $json['cartItem']['productOption']['extensionAttributes']['custom_options'][] = [
+                            'option_id' => $attribute,
+                            'option_value' => $value,
+                        ];
+                    }
                 }
             }
 
