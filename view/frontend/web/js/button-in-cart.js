@@ -116,7 +116,7 @@ define([
                             'shipping_address': shippingAddress,
                             'billing_address': formattedAddress,
                             'shipping_method_code': shippingOption[1],
-                            'shipping_carrier_code': shippingOption[0]
+                            'shipping_carrier_code': shippingOption[0],
                         }
                     }),
                     type: 'post',
